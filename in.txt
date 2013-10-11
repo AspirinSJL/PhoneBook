@@ -1,0 +1,17 @@
+16
+I HonWai 65161234
+D Leong	
+I NamNinh 91234567
+I Jiangwei 83332324
+S HonWai
+I HonWai 87654321
+S HonWai
+D HonWai
+D NNN
+D NNN
+D NNN
+D NNN
+D NNN
+S HonWai
+H
+H
