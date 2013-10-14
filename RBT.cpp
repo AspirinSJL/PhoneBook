@@ -12,15 +12,15 @@
 
 using namespace std;
 
-RBT::Node* RBT::nil = new Node();
+RBT::Node* RBT::nil = new RBT::Node();
 
-bool RBT::isRed(class Node* node)
+bool RBT::isRed(Node* node)
 {
 
     return node->color;
 }
 
-bool RBT::isBlack(class Node* node)
+bool RBT::isBlack(Node* node)
 {
 
     return !(node->color);
@@ -28,13 +28,16 @@ bool RBT::isBlack(class Node* node)
 
 bool RBT::hasRedChild(Node* node)
 {
-    if(isRed(node->children[LEFT]) || isRed(node->children[RIGHT]))
+    if((node->children[LEFT] && isRed(node->children[LEFT])) || (node->children[RIGHT] && isRed(node->children[RIGHT])))
         return true;
     return false;
 }
 
 RBT::Node* RBT::Minimum(Node* node)
 {
+    if(node == nil)
+        return nil;
+
     while(node->children[LEFT] != nil)
         node = node->children[LEFT];
 
@@ -43,6 +46,9 @@ RBT::Node* RBT::Minimum(Node* node)
 
 RBT::Node* RBT::Successor(Node* node)
 {
+    if(node == nil)
+        return nil;
+
     if(node->children[RIGHT] != nil)
         return Minimum(node->children[RIGHT]);
 
@@ -103,15 +109,19 @@ void RBT::Insert(KeyType key, TelType tel)
 
     Node* node = new Node(key, tel);
     node->parent = track;
-    if(node->parent == nil)
+    if(track == nil)
         this->root = node;
-    else if(key < track->key)
-        track->children[LEFT] = node;
     else
-        track->children[RIGHT] = node;
-
+    {
+        if(key < track->key)
+            track->children[LEFT] = node;
+        else
+            track->children[RIGHT] = node;
+    } 
+        
     // cout << "inserted!!" << endl;
     InsertFixup(node);
+    // CheckBalance();
 }
 
 void RBT::Delete(KeyType key)
@@ -134,13 +144,12 @@ void RBT::Delete(KeyType key)
         node->tel = victim->tel;        
     }
 
-    if(victim->children[LEFT])
+    if(victim->children[LEFT] != nil)
         replace = victim->children[LEFT];
     else
         replace = victim->children[RIGHT];
 
-    if(replace != nil)
-        replace->parent = victim->parent;
+    replace->parent = victim->parent; // must do this for fixup upward!
 
     if(victim->parent == nil)
         this->root = replace;
@@ -158,6 +167,7 @@ void RBT::Delete(KeyType key)
     // cout << "deleted!!" << endl;
 
     delete victim;
+    // CheckBalance();
 }
 
 RBT::Node* RBT::Locate(KeyType key)
@@ -187,10 +197,13 @@ void RBT::Rotate(Node* node, SIDE Side)
     oldChild->parent = node->parent;
     if(oldChild->parent == nil)
         this->root = oldChild;
-    else if(node == node->parent->children[Side])
-        node->parent->children[Side] = oldChild;
     else
-        node->parent->children[sidE] = oldChild;
+    {
+        if(node == node->parent->children[Side])
+            node->parent->children[Side] = oldChild;
+        else
+            node->parent->children[sidE] = oldChild;
+    }   
 
     oldChild->children[Side] = node;
     node->parent = oldChild;
@@ -248,7 +261,9 @@ void RBT::DeleteFixup(Node* node)
     // cout << "to fixup delete" << endl;
     while(node != this->root && isBlack(node))
     {
+        // Print();
         SIDE Side, sidE;
+
         if(node == node->parent->children[LEFT])
         {
             Side = LEFT;
@@ -313,7 +328,7 @@ void RBT::Print(class Node* node, int depth)
     for(int i = 0; i < depth; i++)
         margin += aTab;
 
-    cout << margin << "(" << node->key << ")\n";
+    cout << margin << "(" << node->key  << ' ' << (node->color == RED ? 'R' : 'B') << ")\n";
 
     if(node->children[LEFT] != nil)
         Print(node->children[LEFT], depth + 1);

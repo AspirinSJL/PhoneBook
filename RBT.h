@@ -14,7 +14,7 @@
 using namespace std;
 
 enum COLOR  {RED = true, BLACK = false};
-enum SIDE   {LEFT, RIGHT};
+enum SIDE   {LEFT = 0, RIGHT = 1};
 
 typedef string KeyType;
 typedef string TelType;
@@ -31,13 +31,17 @@ private:
         Node* children[2];
         Node* parent;
 
-        Node(KeyType key, TelType tel) : key(key), tel(tel), color(RED)
+        Node(KeyType key, TelType tel) : key(key), tel(tel), color(RED), parent(nil)
         {
             children[LEFT] = nil;
             children[RIGHT] = nil;
         };
 
-        Node() : color(BLACK) {};
+        Node() : color(BLACK), parent(NULL) 
+        {
+            children[LEFT] = NULL;
+            children[RIGHT] = NULL;
+        };
     };
 
 public:
@@ -46,12 +50,12 @@ public:
 
     RBT() : root(nil) {};
 
-    inline bool isRed(class Node* node);
+    inline bool isRed(Node* node);
     inline bool isBlack(Node* node);
     inline bool hasRedChild(Node* node);
     Node* Minimum(Node* node);
     Node* Successor(Node* node);
-    long Height(class Node* node);
+    long Height(Node* node);
     long Height();
 
     TelType Search(KeyType key);
@@ -63,7 +67,7 @@ public:
     void InsertFixup(Node* node);
     void DeleteFixup(Node* node);
 
-    void Print(class Node* node, int depth);
+    void Print(Node* node, int depth);
     void Print();
     int CheckBalance(Node* node);
     void CheckBalance();
